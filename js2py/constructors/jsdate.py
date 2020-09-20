@@ -1,6 +1,13 @@
 from ..base import *
 from .time_helpers import *
 
+try:
+    from dateutil import parser
+except:
+    warnings.warn(
+        'Please install or fix dateutil library (pip install python-dateutil) for better Date.parse support'
+    )
+
 TZ_OFFSET = (time.altzone // 3600)
 ABS_OFFSET = abs(TZ_OFFSET)
 TZ_NAME = time.tzname[1]
@@ -117,12 +124,15 @@ class PyJsDate(PyJs):
             )
 
 
-def parse_date(py_string):  # todo support all date string formats
+def parse_date(py_string):
     try:
         try:
-            dt = datetime.datetime.strptime(py_string, "%Y-%m-%dT%H:%M:%S.%fZ")
+            dt = parser.parse(py_string)
         except:
-            dt = datetime.datetime.strptime(py_string, "%Y-%m-%dT%H:%M:%SZ")
+            try:
+                dt = datetime.datetime.strptime(py_string, "%Y-%m-%dT%H:%M:%S.%fZ")
+            except:
+                dt = datetime.datetime.strptime(py_string, "%Y-%m-%dT%H:%M:%SZ")
         return MakeDate(
             MakeDay(Js(dt.year), Js(dt.month - 1), Js(dt.day)),
             MakeTime(
@@ -131,7 +141,7 @@ def parse_date(py_string):  # todo support all date string formats
     except:
         raise MakeError(
             'TypeError',
-            'Could not parse date %s - unsupported date format. Currently only supported format is RFC3339 utc. Sorry!'
+            'Could not parse date %s - unsupported date format.'
             % py_string)
 
 
