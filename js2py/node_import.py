@@ -19,7 +19,7 @@ def _init():
     ) == 0, 'You must have node installed! run: brew install node'
     assert subprocess.call(
         'cd %s&&npm install babel-core babel-cli babel-preset-es2015 babel-polyfill babelify browserify browserify-shim'
-        % repr(DIRNAME),
+        % '"{}"'.format(DIRNAME),
         shell=True,
         cwd=DIRNAME) == 0, 'Could not link required node_modules'
     DID_INIT = True
@@ -89,7 +89,7 @@ def _get_and_translate_npm_module(module_name, include_polyfill=False, update=Fa
             pkg_name += '@' + maybe_version_str
         # make sure the module is installed
         assert subprocess.call(
-            'cd %s&&npm install %s' % (repr(DIRNAME), pkg_name),
+            'cd %s&&npm install %s' % ('"{}"'.format(DIRNAME), pkg_name),
             shell=True,
             cwd=DIRNAME
         ) == 0, 'Could not install the required module: ' + pkg_name
